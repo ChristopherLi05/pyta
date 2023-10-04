@@ -253,7 +253,7 @@ def _check_function_contracts(wrapped, instance, args, kwargs):
         return_type = annotations["return"]
         try:
             _debug(f"Checking return type from call to {wrapped.__qualname__}")
-            check_type_strict("return", r, return_type)
+            check_type_strict("return", r, return_type, enforce_custom=True)
         except (TypeError, TypeCheckError):
             raise PyTAContractError(
                 f"{wrapped.__name__}'s return value {_display_value(r)} did not match "
@@ -289,18 +289,23 @@ def _check_function_contracts(wrapped, instance, args, kwargs):
     return r
 
 
-def check_type_strict(argname: str, value: Any, expected_type: type) -> None:
+def check_type_strict(
+    argname: str, value: Any, expected_type: type, enforce_custom: bool = False
+) -> None:
     """Ensure that ``value`` matches ``expected_type``.
 
-    Differentiates between:
+    Setting enforce_custom = True will differentiate between:
         - float vs. int
         - bool vs. int
+
+    Otherwise, we rely on typeguard for type checking
     """
     if ENABLE_CONTRACT_CHECKING:
-        if (type(value) is int and expected_type is float) or (
-            type(value) is bool and expected_type is int
-        ):
-            raise TypeError(f"type of {argname} must be {expected_type}; got {value} instead")
+        if enforce_custom:
+            if (type(value) is int and expected_type is float) or (
+                type(value) is bool and expected_type is int
+            ):
+                raise TypeError(f"type of {argname} must be {expected_type}; got {value} instead")
         check_type(
             value, expected_type, collection_check_strategy=CollectionCheckStrategy.ALL_ITEMS
         )
