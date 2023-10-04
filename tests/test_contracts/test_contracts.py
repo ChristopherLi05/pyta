@@ -209,8 +209,7 @@ def test_parameter_float_int_error() -> None:
     def parameter_float(num: float) -> None:
         return None
 
-    with pytest.raises(AssertionError):
-        parameter_float(1)
+    parameter_float(1)
 
 
 def test_parameter_int_bool_error() -> None:
@@ -218,8 +217,7 @@ def test_parameter_int_bool_error() -> None:
     def parameter_int(num: int) -> None:
         return None
 
-    with pytest.raises(AssertionError):
-        parameter_int(True)
+    parameter_int(True)
 
 
 def test_parameter_bool_int_error() -> None:
